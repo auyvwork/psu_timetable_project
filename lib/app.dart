@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'nav/navigation.dart'; позже верну
 import 'screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class App extends StatefulWidget {
   final bool isLoggedIn;
@@ -12,13 +12,26 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.system;
 
-  // void _toggleTheme(bool isDark) {
-  //   setState(() {
-  //     _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-  //   });
-  // }
+  void _toggleTheme(bool isDark) {
+    setState(() {
+      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+    await prefs.remove('password');
+
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +70,74 @@ class _AppState extends State<App> {
         ),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),  // верну как было как тоько авторизация станет идеальна
-      // home: widget.isLoggedIn
-      //     ? MyHomePage(onThemeChanged: _toggleTheme)
-      //     : const LoginScreen(),
-      // routes: {
-      //   '/home': (context) => MyHomePage(onThemeChanged: _toggleTheme),
-      // },
+      initialRoute: widget.isLoggedIn ? '/home' : '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => MyHomePage(onThemeChanged: _toggleTheme, onLogout: _logout),
+      },
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  final Function(bool) onThemeChanged;
+  final Function() onLogout;
+
+  const MyHomePage({
+    super.key,
+    required this.onThemeChanged,
+    required this.onLogout,
+  });
+
+  Future<void> _showLogoutDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Выход'),
+          content: const Text('Вы уверены, что хотите выйти?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onLogout();
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Выйти'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Главная'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () {
+              _showLogoutDialog(context);
+            },
+            tooltip: 'Выйти',
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Text(
+          'Добро пожаловать!',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
     );
   }
 }

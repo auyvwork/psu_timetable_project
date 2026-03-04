@@ -2,14 +2,14 @@ import 'dart:io';
 import 'app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_symbol_data_file.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting('ru_RU', '' );
+  await initializeDateFormatting('ru_RU', null);
   var prefs = await SharedPreferences.getInstance();
   final bool isLoggedIn = prefs.getString('username')?.isNotEmpty ?? false;
 
