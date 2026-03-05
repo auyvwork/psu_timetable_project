@@ -17,14 +17,16 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarContrastEnforced: false,
-
+      statusBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark, 
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
 
-  runApp(App(isLoggedIn: isLoggedIn));
+  runApp(App(
+    isLoggedIn: isLoggedIn,));
 }
 
 class MyHttpOverrides extends HttpOverrides {
