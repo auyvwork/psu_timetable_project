@@ -27,6 +27,7 @@ Future<void> main() async {
     ),
   );
 
+
   runApp(App(
     isLoggedIn: isLoggedIn,));
 }
