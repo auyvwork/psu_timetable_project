@@ -33,21 +33,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _uController.dispose(); _pController.dispose();
-    _uFocus.dispose(); _pFocus.dispose();
+    _uController.dispose();
+    _pController.dispose();
+    _uFocus.dispose();
+    _pFocus.dispose();
     super.dispose();
   }
 
   Future<void> _doLogin() async {
     if (_uController.text.trim().isEmpty || _pController.text.trim().isEmpty) return;
     FocusScope.of(context).unfocus();
-    setState(() { _errorMessage = null; _isLoading = true; });
+    setState(() {
+      _errorMessage = null;
+      _isLoading = true;
+    });
 
     try {
       const loginUrl = 'https://student.psu.ru/pls/stu_cus_et/stu.login';
       final response = await dio.post(
         loginUrl,
-        data: {'p_username': _uController.text.trim(), 'p_password': _pController.text.trim()},
+        data: {
+          'p_username': _uController.text.trim(),
+          'p_password': _pController.text.trim()
+        },
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
           followRedirects: false,
@@ -57,7 +65,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final String html = response.data.toString();
-      bool isError = html.contains('Неверный логин') || html.contains('invalid password') || html.contains('p_username');
+      bool isError = html.contains('Неверный логин') ||
+          html.contains('invalid password') ||
+          html.contains('p_username');
 
       if ((response.statusCode == 302 || response.statusCode == 200) && !isError) {
         final prefs = await SharedPreferences.getInstance();
@@ -79,36 +89,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final bool isKeyVisible = keyboardHeight > 0;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
+      value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
         systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.dark,
-        systemNavigationBarContrastEnforced: false,
+        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // Основной контент
             Column(
               children: [
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 550),
                   curve: Curves.ease,
                   height: isKeyVisible
-                      ? MediaQuery.of(context).size.height * 0.23
+                      ? MediaQuery.of(context).size.height * 0.20
                       : MediaQuery.of(context).size.height * 0.3,
                   child: ClipPath(
                     clipper: CurveClipper(),
                     child: Container(
                       width: double.infinity,
-                      color: const Color(0xFFEFEFEF),
+                      color: colorScheme.secondaryContainer.withOpacity(0.5),
                       child: Stack(
                         children: [
                           Positioned(
@@ -125,19 +135,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Text(
+                                      Text(
                                         "Етис 2.0",
-                                        style: TextStyle(
-                                            fontSize: 32,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black),
+                                        style: theme.textTheme.headlineMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: colorScheme.onSurface,
+                                        ),
                                       ),
-                                      const Text(
+                                      Text(
                                         "По всем вопросам звоните по телефону 2396870.",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black),
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w300,
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -165,33 +175,35 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Text(
+                                Text(
                                   "Вход",
-                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: Colors.black),
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.onSurface,
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 _buildField("Логин", _uController, _uFocus, _pFocus),
                                 const SizedBox(height: 20),
                                 _buildField("Пароль", _pController, _pFocus, null, isPass: true),
-
                                 if (_errorMessage != null)
                                   Container(
                                     margin: const EdgeInsets.only(top: 24),
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                                     decoration: BoxDecoration(
-                                      color: Colors.red.withOpacity(0.05),
+                                      color: colorScheme.errorContainer.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.info_outline, color: Colors.red, size: 16),
+                                        Icon(Icons.info_outline, color: colorScheme.error, size: 16),
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
                                             _errorMessage!,
-                                            style: const TextStyle(
-                                              color: Colors.red,
+                                            style: TextStyle(
+                                              color: colorScheme.error,
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               height: 1.2,
@@ -202,43 +214,39 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 const SizedBox(height: 24),
-
                                 SizedBox(
                                   width: double.infinity,
-                                  height: 40,
+                                  height: 44,
                                   child: ElevatedButton(
                                     onPressed: _isLoading ? null : _doLogin,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF4264EB),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: colorScheme.primary,
+                                      foregroundColor: colorScheme.onPrimary,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                       elevation: 0,
                                     ),
                                     child: _isLoading
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                       width: 24,
                                       height: 24,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                        color: colorScheme.onPrimary,
+                                        strokeWidth: 2,
+                                      ),
                                     )
-                                        : const Text("Войти", style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal)),
+                                        : const Text("Войти", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
                                 TextButton(
                                   onPressed: () {},
                                   style: TextButton.styleFrom(
+                                    foregroundColor: colorScheme.primary,
                                     padding: const EdgeInsets.all(8),
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    alignment: Alignment.centerLeft,
                                   ),
                                   child: const Text(
                                     "забыли пароль?",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                      color: Color(0xFF4264EB),
-                                    ),
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
                                   ),
                                 )
                               ],
@@ -256,14 +264,14 @@ class _LoginScreenState extends State<LoginScreen> {
               left: 0,
               right: 0,
               child: Opacity(
-                opacity: 0.5,
-                child: const Text(
+                opacity: 0.7,
+                child: Text(
                   "#от студентов для студентов",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF4264EB),
+                    color: colorScheme.primary,
                   ),
                 ),
               ),
@@ -275,32 +283,39 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildField(String label, TextEditingController controller, FocusNode focus, FocusNode? next, {bool isPass = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
+          keyboardType: isPass? TextInputType.visiblePassword : TextInputType.emailAddress,
           controller: controller,
           focusNode: focus,
           obscureText: isPass,
           onSubmitted: (_) => next != null ? FocusScope.of(context).requestFocus(next) : _doLogin(),
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFFFFFFF),
-            constraints: const BoxConstraints(maxHeight: 40),
+            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            constraints: const BoxConstraints(maxHeight: 45),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.black, width: 1.0),
+              borderSide: BorderSide(color: colorScheme.outline, width: 1.0),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Color(0xFF4264EB), width: 2.0),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2.0),
             ),
           ),
         ),
