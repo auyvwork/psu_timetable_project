@@ -3,14 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LessonCard extends StatelessWidget {
-  final String name;
-  final String room;
-  final String teacher;
-  final String startTime;
-  final String endTime;
-  final String date;
-  final String? link;
-
   const LessonCard({
     super.key,
     required this.name,
@@ -22,32 +14,50 @@ class LessonCard extends StatelessWidget {
     this.link,
   });
 
-  Future<void> _launchURL() async {
-    if (link != null) {
-      final Uri url = Uri.parse(link!);
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        throw Exception('Could not launch $url');
-      }
+  final String name;
+  final String room;
+  final String teacher;
+  final String startTime;
+  final String endTime;
+  final String date;
+  final String? link;
+
+  bool get _isOnline => link != null && link!.isNotEmpty;
+
+  Future<void> _launchURL(BuildContext context) async {
+    if (!_isOnline) return;
+
+    final Uri url = Uri.parse(link!);
+    final bool opened = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Не удалось открыть ссылку занятия'),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    bool isOnline = link != null;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 8, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: IntrinsicHeight(
         child: Row(
-          children: [
+          children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 16, 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: SizedBox(
                 width: 50,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  children: <Widget>[
                     Text(
                       startTime,
                       style: theme.textTheme.labelMedium?.copyWith(
@@ -57,59 +67,66 @@ class LessonCard extends StatelessWidget {
                     Expanded(
                       child: Container(
                         width: 1,
-                        color: theme.colorScheme.outlineVariant,
                         margin: const EdgeInsets.symmetric(vertical: 8),
+                        color: colorScheme.outlineVariant,
                       ),
                     ),
-                    Text(endTime, style: theme.textTheme.labelSmall),
+                    Text(
+                      endTime,
+                      style: theme.textTheme.labelSmall,
+                    ),
                   ],
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.shadow.withOpacity(0.05),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                      spreadRadius: 0,
-                    ),
-                  ],
-
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant.withOpacity(0.4),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+              child: InkWell(
+                onTap: _isOnline ? () => _launchURL(context) : null,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
+                    ],
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withOpacity(0.4),
                     ),
-                    const SizedBox(height: 12),
-                    InkWell(
-                      onTap: isOnline ? _launchURL : null,
-                      child: _buildInfoRow(
-                        isOnline
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        name,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(
+                        icon: _isOnline
                             ? Icons.videocam_outlined
                             : CupertinoIcons.map_pin_ellipse,
-                        room,
-                        theme,
-                        textColor: isOnline ? theme.colorScheme.primary : null,
+                        text: room,
+                        theme: theme,
+                        textColor: _isOnline ? colorScheme.primary : null,
+                        underline: _isOnline,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow(CupertinoIcons.person, teacher, theme),
-                  ],
+                      const SizedBox(height: 8),
+                      _buildInfoRow(
+                        icon: CupertinoIcons.person,
+                        text: teacher,
+                        theme: theme,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -119,26 +136,29 @@ class LessonCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(
-    IconData icon,
-    String text,
-    ThemeData theme, {
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String text,
+    required ThemeData theme,
     Color? textColor,
+    bool underline = false,
   }) {
+    final ColorScheme colorScheme = theme.colorScheme;
+
     return Row(
-      children: [
+      children: <Widget>[
         Icon(
           icon,
           size: 16,
-          color: textColor ?? theme.colorScheme.onSurface.withOpacity(0.5),
+          color: textColor ?? colorScheme.onSurface.withOpacity(0.5),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: textColor,
-              decoration: textColor != null ? TextDecoration.underline : null,
+              color: textColor ?? colorScheme.onSurface,
+              decoration: underline ? TextDecoration.underline : null,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
