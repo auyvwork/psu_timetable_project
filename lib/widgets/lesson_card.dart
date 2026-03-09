@@ -89,6 +89,7 @@ class LessonCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
+
                     boxShadow: <BoxShadow>[
                       BoxShadow(
                         color: colorScheme.shadow.withOpacity(0.05),
@@ -97,7 +98,8 @@ class LessonCard extends StatelessWidget {
                       ),
                     ],
                     border: Border.all(
-                      color: colorScheme.outlineVariant.withOpacity(0.4),
+                      color: colorScheme.primary.withOpacity(0.5),
+                      width: 1
                     ),
                   ),
                   child: Column(

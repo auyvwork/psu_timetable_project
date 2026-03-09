@@ -80,14 +80,8 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final bool isDark = theme.brightness == Brightness.dark;
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      ),
-      child: Scaffold(
+    return
+       Scaffold(
         body: Stack(
           children: <Widget>[
             _buildDrawer(),
@@ -108,22 +102,37 @@ class _HomePageState extends State<HomePage>
             ),
           ],
         ),
-      ),
+
     );
   }
 
   Widget _buildMainScreen(ThemeData theme, ColorScheme colorScheme) {
+    final bool isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: colorScheme.secondaryContainer.withOpacity(0.5),
       appBar: AppBar(
-        toolbarHeight: 64,
-        backgroundColor: colorScheme.secondaryContainer.withOpacity(0.5),
-        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          systemStatusBarContrastEnforced: false,
+        ),
+
+        toolbarHeight: 60,
+        backgroundColor: Colors.transparent,
         leading: Padding(
           padding: const EdgeInsets.only(top: 12, left: 8),
           child: IconButton(
             icon: const Icon(Icons.menu, size: 28),
             onPressed: _toggleMenu,
+
+            padding: EdgeInsets.zero,
+
+            constraints: const BoxConstraints(),
+            style: IconButton.styleFrom(
+              fixedSize: const Size(44, 44),
+              shape: const CircleBorder(),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
         ),
         title: ValueListenableBuilder<String>(
@@ -182,6 +191,7 @@ class _HomePageState extends State<HomePage>
         ],
       ),
     );
+
   }
 
   Widget _buildOverlay() {

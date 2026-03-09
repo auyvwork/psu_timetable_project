@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness:
-            theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+             Brightness.dark ,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarIconBrightness:
             theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,

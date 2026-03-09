@@ -29,6 +29,15 @@ class App extends StatefulWidget {
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color(0xFF4264EB),
       brightness: Brightness.light,
+      secondaryContainer: Color(0xffefefef),
+      primary: Color(0xff4264eb),
+      surface: Color(0xffffffff)
+    ),
+    datePickerTheme: DatePickerThemeData(
+      headerBackgroundColor: const Color(0xFF4264EB),
+      headerForegroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      dayStyle: const TextStyle(fontWeight: FontWeight.bold),
     ),
     scaffoldBackgroundColor: const Color(0xFFF9F9F9),
   );
@@ -36,8 +45,22 @@ class App extends StatefulWidget {
   static final ThemeData _darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF4264EB),
+      seedColor: const Color(0xFF3F4A77),
       brightness: Brightness.dark,
+        secondaryContainer: Color(0xff292a2f),
+        primary: const Color(0xFFB0C2FF),
+        surface: Color(0xff34343a)
+    ),
+
+    datePickerTheme: DatePickerThemeData(
+      headerBackgroundColor: const Color(0xFF3F4A77),
+      headerForegroundColor: const Color(0xFFB0C2FF),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return const Color(0xFFB0C2FF);
+        return null;
+      }),
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),
   );
