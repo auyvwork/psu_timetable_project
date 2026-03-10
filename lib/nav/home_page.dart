@@ -110,7 +110,10 @@ class _HomePageState extends State<HomePage>
     final bool isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: colorScheme.secondaryContainer.withOpacity(0.5),
-      appBar: AppBar(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(72),
+        child:Padding(padding: EdgeInsetsGeometry.only(top: 16  ),
+      child:  AppBar(
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
@@ -177,6 +180,8 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ],
+      ),
+        )
       ),
       body: IndexedStack(
         index: _currentIndex,

@@ -14,23 +14,23 @@ class AppNavigationDrawer extends StatelessWidget {
   static const List<_DrawerItem> _items = <_DrawerItem>[
     _DrawerItem(
       label: 'Расписание',
-      icon: CupertinoIcons.calendar_today,
-      activeIcon: CupertinoIcons.calendar_today,
+      icon: Icons.calendar_month_outlined,
+      activeIcon: Icons.calendar_month_sharp,
     ),
     _DrawerItem(
       label: 'Настройки',
-      icon: CupertinoIcons.settings,
-      activeIcon: CupertinoIcons.settings_solid,
+      icon: Icons.settings_outlined,
+      activeIcon: Icons.settings,
     ),
     _DrawerItem(
       label: 'Учебный план',
-      icon: CupertinoIcons.square_list,
-      activeIcon: CupertinoIcons.square_list_fill,
+      icon: Icons.list_alt_outlined,
+      activeIcon: Icons.list_alt_sharp,
     ),
     _DrawerItem(
       label: 'Оценки',
-      icon: Icons.auto_graph_rounded,
-      activeIcon: Icons.auto_graph_rounded,
+      icon: Icons.school_outlined,
+      activeIcon: Icons.school,
     ),
   ];
 
@@ -47,11 +47,11 @@ class AppNavigationDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(28, 20, 16, 12),
               child: Text(
-                'Меню ПГНИУ',
+                'ЕТИС 2.0',
                 style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+
+                  fontWeight: FontWeight.w500,
+                  fontSize: 24
                 ),
               ),
             ),
@@ -116,7 +116,7 @@ class NavigationDrawerDestinationWidget extends StatelessWidget {
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(16),
           color:
               isSelected ? colorScheme.secondaryContainer : Colors.transparent,
         ),

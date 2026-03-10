@@ -31,11 +31,12 @@ class App extends StatefulWidget {
       brightness: Brightness.light,
       secondaryContainer: Color(0xffefefef),
       primary: Color(0xff4264eb),
-      surface: Color(0xffffffff)
+      surface: Color(0xffffffff),
     ),
     datePickerTheme: DatePickerThemeData(
-      headerBackgroundColor: const Color(0xFF4264EB),
-      headerForegroundColor: Colors.white,
+     // headerBackgroundColor: const Color(0xFF4264EB),
+      headerForegroundColor: Colors.black,
+
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       dayStyle: const TextStyle(fontWeight: FontWeight.bold),
     ),
@@ -53,7 +54,7 @@ class App extends StatefulWidget {
     ),
 
     datePickerTheme: DatePickerThemeData(
-      headerBackgroundColor: const Color(0xFF3F4A77),
+     // headerBackgroundColor: const Color(0xFF3F4A77),
       headerForegroundColor: const Color(0xFFB0C2FF),
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
