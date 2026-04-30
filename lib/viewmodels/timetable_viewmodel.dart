@@ -7,6 +7,7 @@ import 'package:enough_convert/enough_convert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:home_widget/home_widget.dart';
 import '../models/lesson.dart';
 
 class TimetableViewModel extends ChangeNotifier {
@@ -186,11 +187,20 @@ class TimetableViewModel extends ChangeNotifier {
 
   Future<void> _saveToCache() async {
     final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(_timetable.map((k, v) => MapEntry(k, v.map((e) => e.toJson()).toList())));
-    await prefs.setString('cached_timetable', encoded);
+    final timetableData = _timetable.map((k, v) => MapEntry(k, v.map((e) => e.toJson()).toList()));
+    final encoded = jsonEncode(timetableData);
 
+    await prefs.setString('cached_timetable', encoded);
     await prefs.setString('loaded_weeks', jsonEncode(_loadedWeeksIds.toList()));
     if (_currentWeekId != null) await prefs.setInt('current_week_id', _currentWeekId!);
+
+    // Синхронизация с виджетом
+    try {
+      await HomeWidget.saveWidgetData('timetable', encoded);
+      await HomeWidget.updateWidget(androidName: 'MyWidgetProvider');
+    } catch (e) {
+      debugPrint("Widget sync error: $e");
+    }
   }
 
   Future<void> _loadFromCache() async {
@@ -207,6 +217,9 @@ class TimetableViewModel extends ChangeNotifier {
       }
       _currentWeekId = prefs.getInt('current_week_id');
       notifyListeners();
+
+      // Также обновляем виджет при загрузке из кеша
+      _saveToCache();
     }
   }
 

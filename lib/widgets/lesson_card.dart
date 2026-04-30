@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../widget_service.dart'; // замени your_project_name на имя своего проекта
 class LessonCard extends StatelessWidget {
   const LessonCard({
     super.key,
@@ -82,7 +82,26 @@ class LessonCard extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: InkWell(
-                onTap: _isOnline ? () => _launchURL(context) : null,
+                onTap: () {
+                  // 1. Обновляем виджет при каждом нажатии
+                  WidgetService.updateTimetableWidget(
+                    subject: name,
+                    timeAndRoom: '$startTime - $endTime | $room',
+                  );
+
+                  // 2. Если есть ссылка — открываем её
+                  if (_isOnline) {
+                    _launchURL(context);
+                  } else {
+                    // Опционально: показать уведомление, что виджет обновлен
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Расписание отправлено на виджет'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
                   padding: const EdgeInsets.all(16),
